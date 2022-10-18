@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href= "{{ url_for('static',filename='/styles/add.css') }}">
+</head>
+<body>
+    <ul>
+        <li><a href="home">Home</li></a>
+        <li><a class="active" href="add">Add Book</li></a>
+        <li><a href="search">Search Book</li></a>
+        <li><a href="remove">Remove Book</li></a>
+        <li><a href="display">Display Books</a></li>
+        <li><a href="login">Login</li></a>
+        <li><a href="contact">Contact</li></a>   
+    </ul>
+<div class="container">
+    <h3>Qatar Library Mangement System</h3>
+</div>
+<p><b>Add Your Desired Book</b></p>
+<div>
+    <form action="/display" method="POST">
+        <label>TITLE:</label>
+        <input type="text" name="title">
+        <label >Author:</label>
+        <input type="text" name="author" value="" required>
+        <label >Date:</label>
+        <input type="text" name="date" value="" required>
+        <button type="sumbit">Sumbit</button>
+    </form>
+    
+</div>
+
+</body>
