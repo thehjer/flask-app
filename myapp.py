@@ -3,10 +3,28 @@ from flask import Flask, render_template,request
 
 app = Flask(__name__,template_folder = 'templates')
 
+import mysql.connector
+mydb=mysql.connector.connect(    
+    host="localhost",
+    user="root",
+    password="root",
+    database="testdb"
+)
+book_list=[]
+mycursor=mydb.cursor()
 
+def get_allbooks():
+    global book_list
+    mycursor.execute("SELECT * FROM book")
+    myresult=mycursor.fetchall()
+    book_list=[]
+    for x in myresult:
+        book_list.append(x[1:])
+
+    print(book_list)
 # lists=[["thehjer","abdul"],["karna","arav"]]
-students_info=[["Harry Potter","Jk Rowling","August 24th"],
-                ["The Hulk","Russo Brothers","July 25th"]]
+# book_list=[["Harry Potter","Jk Rowling","August 24th"],
+#                 ["The Hulk","Russo Brothers","July 25th"]]
 
 
 @app.route('/home')
@@ -17,51 +35,55 @@ def home():
 
 @app.route('/add')
 def your_url():
-    return render_template('add.html',st_list=students_info)
+    get_allbooks()
+    return render_template('add.html',bk_list=book_list)
 
 
 @app.route('/search',methods=['GET','POST'])
 def search_url():
-    global students_info
+    global book_list
+    get_allbooks()
     if request.method=='POST':
         book=request.form.get('book')
         print(book)
         win=True
-        for i in range(len(students_info)):
+        for i in range(len(book_list)):
             win=True
-            for j in students_info[i]:
-                if students_info[i][0]!=book:
+            for j in book_list[i]:
+                if book_list[i][0]!=book:
                     win=False
             if win==True:
                 return('The book is availabale')
         else:
             return('The book is unavailabale')
             
-        # return render_template("display.html",st_list=students_info)
+        # return render_template("display.html",bk_list=book_list)
     return render_template('search.html')
 
 @app.route('/remove',methods=['GET','POST'])
 def remove_url():
-    global students_info
+    global book_list
+    get_allbooks()
     if request.method=='POST':
         l=[]
         book=request.form.get('book')
         print(book)
         win=True
-        for i in range(len(students_info)):
+        for i in range(len(book_list)):
             win=True
-            for j in students_info[i]:
-                if students_info[i][1]==book:
+            for j in book_list[i]:
+                if book_list[i][1]==book:
                     win=False
                     
             if win==True:
-                l.append(students_info[i])
-        students_info=l                
-        return render_template("display.html",st_list=students_info)
+                l.append(book_list[i])
+        book_list=l                
+        return render_template("display.html",bk_list=book_list)
     return render_template("remove.html")
 
 @app.route('/display',methods=['GET','POST'])
 def display_url():
+    get_allbooks()
     if request.method=='POST':
         title=request.form.get('title')
         print(title)
@@ -69,8 +91,13 @@ def display_url():
         print(author)
         date=request.form.get("date")
         print(date)
-        students_info.append([title,author,date])
-    return render_template("display.html",st_list=students_info)  
+        sql="INSERT INTO book(title,author,date) VALUES(%s,%s,%s)"
+        val=[title,author,date]
+        mycursor.execute(sql,val)
+        mydb.commit()
+        
+    get_allbooks()
+    return render_template("display.html",bk_list=book_list)  
  
 @app.route('/login')
 def login_url():
