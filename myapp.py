@@ -1,5 +1,6 @@
 #My first applications
 from flask import Flask, render_template,request
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__,template_folder = 'templates')
 
@@ -66,18 +67,27 @@ def remove_url():
     get_allbooks()
     if request.method=='POST':
         l=[]
-        book=request.form.get('book')
-        print(book)
+        name=request.form.get('book')
+        print(name)
         win=True
         for i in range(len(book_list)):
             win=True
             for j in book_list[i]:
-                if book_list[i][1]==book:
+                if book_list[i][1]==name:
                     win=False
                     
             if win==True:
                 l.append(book_list[i])
-        book_list=l                
+        book_list=l
+        mycursor = mydb.cursor()
+        sql = "DELETE FROM book(author)  VALUES(%s,)"
+        adr = (name)
+
+        mycursor.execute(sql,adr)
+
+        mydb.commit()
+
+        print(mycursor.rowcount, "record(s) deleted")        
         return render_template("display.html",bk_list=book_list)
     return render_template("remove.html")
 
@@ -107,6 +117,31 @@ def login_url():
 def contact_url():
     return render_template("contact.html")
 
+@app.route('/upload')
+def upload_file():
+    get_allbooks()
+    return render_template('upload.html')
+
+@app.route('/upload', methods = ['GET', 'POST'])
+def uploadfile():
+    global book_list
+    # get_allbooks()
+    if request.method == 'POST':
+        f = request.files['file'] 
+        f.save(secure_filename(f.filename))
+        print(f)
+        for l in f:
+            l=l.strip()
+            l=l.split(',')
+            book_list.append(l)
+        mycursor=mydb.cursor()
+        sql="INSERT INTO book(title,author,date) VALUES(%s,%s,%s)"
+        for book in book_list:
+            mycursor.execute(sql,book)
+            print(mycursor.rowcount,"record inserted")
+        mydb.commit() 
+    # get_allbooks()  
+    return render_template("display.html",bk_list=book_list)
 if (__name__) == '__main__':
-    app.run()
+    app.run(host="0.0.0.0")
  

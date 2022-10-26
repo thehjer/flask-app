@@ -1,10 +1,23 @@
 <!DOCTYPE html>
-<body>
-<!-- <div class="container">
-    <h3>Qatar Library Mangement System</h3>
-</div> -->
+    <head>
+        <link rel="stylesheet" href= "{{ url_for('static',filename='/styles/display.css') }}">
+    </head>
+    <body>
+        <ul>
+            <li><a href="home">Home</li></a>
+            <li><a href="add">Add Book</li></a>
+            <li><a href="search">Search Book</li></a>
+            <li><a href="remove">Remove Book</li></a>
+            <li><a href="display">Display Books</a></li>
+            <li><a href="login">Login</li></a>
+            <li><a href="contact">Contact</li></a>
+            <li><a class="active" href="upload">upload</li></a>   
+        </ul>
+    <div class="container">
+            <h3>Qatar Library Mangement System</h3>
+        </div>
 <div>
-        <form action="/upload" method="POST" >
+        <form action="/upload" method="POST" enctype="multipart/form-data">
             <input type="file" name="file">
             <button type="sumbit">Sumbit</button>
         </form>
